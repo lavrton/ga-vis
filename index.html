@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GA visualization</title>
+</head>
+<body>
+    <section id="auth-button"></section>
+    <section id="view-selector"></section>
+    <section id="canvas">
+      <pre id="data"></pre>
+    </section>
+
+    <script>
+    (function(w,d,s,g,js,fjs){
+      g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(cb){this.q.push(cb)}};
+      js=d.createElement(s);fjs=d.getElementsByTagName(s)[0];
+      js.src='https://apis.google.com/js/platform.js';
+      fjs.parentNode.insertBefore(js,fjs);js.onload=function(){g.load('analytics')};
+    }(window,document,'script'));
+    </script>
+
+    <script type="text/javascript" src="./main.js"></script>
+</body>
+</html>
