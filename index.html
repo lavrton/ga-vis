@@ -2,14 +2,34 @@
 <html>
 <head>
     <title>GA visualization</title>
+    <style>
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    body {
+      padding: 0;
+    }
+    #panel {
+      width: 20%;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: lightgrey;
+    }
+    </style>
 </head>
 <body>
-    <section id="auth-button"></section>
-    <section id="view-selector"></section>
-    <section id="canvas">
-      <pre id="data"></pre>
-    </section>
+    <div id='panel'>
+      <section id="auth-button"></section>
+      <section id="view-selector"></section>
+      <section>
+        <pre id="data"></pre>
+      </section>
+    </div>
+    <canvas id="canvas"></canvas>
 
+    <!-- google analytics -->
     <script>
     (function(w,d,s,g,js,fjs){
       g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(cb){this.q.push(cb)}};
@@ -19,6 +39,12 @@
     }(window,document,'script'));
     </script>
 
+    <!-- libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./lodash.min.js"></script>
+
+    <!-- our app -->
     <script type="text/javascript" src="./main.js"></script>
+    <script type="text/javascript" src="./tests.js"></script>
 </body>
 </html>
