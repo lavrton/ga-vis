@@ -1,14 +1,3 @@
-function reset() {
-  var i = nodes.length;
-  while(i--) {
-    nodes.pop();
-  }
-  i = links.length;
-  while(i--) {
-    links.pop();
-  }
-}
-
 function test() {
   prepareNodes([{page: 'hello', users: 1}]);
   console.assert(nodes.length === 2);
@@ -42,7 +31,7 @@ function test() {
   prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
   console.assert(nodes.length === 5);
   console.assert(links.length === 2);
-  var n = _.filter(nodes, function(node) {
+  n = _.filter(nodes, function(node) {
     return node.type === 'user' && node.page === 'home';
   }).length;
   console.assert(n === 1);
@@ -56,8 +45,42 @@ function test() {
   console.assert(nodes.length === 8);
   reset();
 
+  prepareNodes([{page: '/', users: 2}]);
+  prepareNodes([{page: '/', users: 1}]);
+  console.assert(nodes.length === 2);
+  reset();
+}
 
-
+var PAGES = 10;
+var USERS = 50;
+function generateData() {
+  reset();
+  var data = [];
+  for (var i = 0; i < PAGES; i++) {
+    data.push({
+      page : 'page with long links so be ready' + i,
+      users: Math.round(Math.random() * USERS)
+  });
+  }
+  prepareNodes(data);
+  force.gravity(PAGES * 0.0005 + 0.01);
+  force.start();
 }
 
 test();
+
+
+// var pagesInput = document.getElementById('pagesInput');
+// var gravityInput = document.getElementById('gravityInput');
+// var chargeInput = document.getElementById('chargeInput');
+//
+// pagesInput.addEventListener('input', updateParams);
+// gravityInput.addEventListener('input', updateParams);
+// chargeInput.addEventListener('input', updateParams);
+//
+// function updateParams() {
+//   PAGES = parseInt(pagesInput.value);
+//   force.charge(-200 * parseInt(chargeInput.value) / 100);
+//   force.gravity(PAGES * 0.01 * parseInt(gravityInput.value) / 100 + 0.01);
+//   generateData();
+// }

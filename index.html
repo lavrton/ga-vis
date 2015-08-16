@@ -16,6 +16,17 @@
       width: 20%;
       background-color: rgba(0, 0, 0, 0.5);
       color: lightgrey;
+      position: absolute;
+      top:0;
+    }
+    #controls {
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: white;
+    }
+    #canvas {
+        background-color: black;
     }
     </style>
 </head>
@@ -27,7 +38,12 @@
         <pre id="data"></pre>
       </section>
     </div>
-    <canvas id="canvas"></canvas>
+    <!-- <div id="controls">
+        Pages: <input type="range" min="1" max="100" step="1" value="3" id="pagesInput"></input>
+        Gravity: <input type="range" min="1" max="100" step="1" value="3" id="gravityInput"></input>
+        Charge: <input type="range" min="1" max="100" step="1" value="3" id="chargeInput"></input>
+    </div> -->
+    <div id="canvas"></div>
 
     <!-- google analytics -->
     <script>
@@ -40,11 +56,14 @@
     </script>
 
     <!-- libs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="./lodash.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/konvajs/konva/0.9.5/konva.min.js"></script>
+
 
     <!-- our app -->
     <script type="text/javascript" src="./main.js"></script>
+    <script type="text/javascript" src="./node.js"></script>
     <script type="text/javascript" src="./tests.js"></script>
 </body>
 </html>

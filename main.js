@@ -21,167 +21,199 @@ gapi.analytics.ready(function() {
 });
 
 
-var container = document.getElementById('data');
+// var container = document.getElementById('data');
+
+var stage = new Konva.Stage({
+    container: 'canvas'
+});
+var layer = new Konva.Layer();
+stage.add(layer);
+
+function updateStageSize() {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    stage.size({width:width, height:height});
+}
+window.addEventListener('resize', updateStageSize);
+updateStageSize();
 
 
-var width = window.innerWidth;
-var height = window.innerHeight;
 
-var canvas = document.getElementById('canvas');
-canvas.width = width;
-canvas.height = height;
-var context = canvas.getContext('2d');
+
+
+
+// var canvas = document.getElementById('canvas');
+// canvas.width = width;
+// canvas.height = height;
+// var context = canvas.getContext('2d');
 
 var nodes = [];
-
 var links = [];
 
 
 var force = d3.layout.force()
     .nodes(nodes)
     .links(links)
-    .size([width, height])
-    .gravity(.05)
-    .distance(100)
-    .charge(-500)
+    .size([window.innerWidth, window.innerHeight])
+    .gravity(0.05)
+    // .distance(100)
+    .linkDistance(15)
+    .charge(-26)
     .on("tick", tick)
+    .on('end', function() {force.start();})
     .start();
 
-var fontSize = 5;
-var maxChars = 23;
-function drawPage(context, data) {
-  var title = data.page;
+window.addEventListener('resize', function updateForceSize() {
+    force.size([window.innerWidth, window.innerHeight]);
+});
 
-  if (title.length > maxChars) {
-    title = title.slice(0, maxChars - 5) + '..' + title.slice(title.length - 3, title.length);
-  }
-  context.beginPath();
-  context.arc(data.x, data.y, title.length * fontSize / 2 + 4, 0, 2 * Math.PI);
-  context.closePath();
-  context.fillStyle = 'white';
-  context.fill();
-  context.fillStyle = 'grey';
-  context.fillText(title, data.x - title.length * fontSize / 2.2, data.y + fontSize / 2);
-}
-
-function drawUser(context, data) {
-  context.beginPath();
-  context.arc(data.x, data.y, 3, 0, 2 * Math.PI);
-  context.closePath();
-  context.fillStyle = 'yellow';
-  context.fill();
-}
+// var fontSize = 5;
+// var maxChars = 23;
+// function drawPage(context, data) {
+//   var title = data.page;
+//
+//   if (title.length > maxChars) {
+//     title = title.slice(0, maxChars - 5) + '..' + title.slice(title.length - 3, title.length);
+//   }
+//   context.beginPath();
+//   context.arc(data.x, data.y, title.length * fontSize / 2 + 4, 0, 2 * Math.PI);
+//   context.closePath();
+//   context.fillStyle = 'white';
+//   context.fill();
+//   context.fillStyle = 'grey';
+//   context.fillText(title, data.x - title.length * fontSize / 2.2, data.y + fontSize / 2);
+// }
+//
+// function drawUser(context, data) {
+//   context.beginPath();
+//   context.arc(data.x, data.y, 3, 0, 2 * Math.PI);
+//   context.closePath();
+//   context.fillStyle = 'yellow';
+//   context.fill();
+// }
 
 function tick(e) {
-  context.fillStyle = 'black';
-  context.fillRect(0,0, width, height);
+
+  // turn stars
+  links.forEach(function(link) {
+      var planet = link.source;
+      var star = link.target;
+      var dx = star.x - planet.x;
+      var dy = star.y - planet.y;
+
+      var radius = Math.sqrt(dx * dx + dy * dy);
+
+      // do nothing if start to far away...
+      if (radius > force.linkDistance() * 2) {
+          return;
+      }
+      var angle = Math.atan2(dy, dx);
+      angle += star.speed;
+
+      star.x = radius * Math.cos(angle) + planet.x;
+      star.y = radius * Math.sin(angle) + planet.y;
+  });
 
   nodes.forEach(function(o, i) {
-    if (o.type === 'user') {
-        drawUser(context, o);
-    } else {
-        drawPage(context, o);
-    }
+    o.update();
   });
+  stage.draw();
 }
 
 function prepareNodes(data) {
-  // var pagesNodes = [];
-  // var allUserNodes = nodes.filter(function(node) {
-  //   return node.type === 'user';
-  // });
-
-
-
-
-  // 1. add new planets if required
-  data.forEach(function(row) {
-
-    var pageNode = nodes.filter(function(node) {
-      return node.page === row.page;
-    })[0];
-    if (!pageNode) {
-      pageNode = {
-        page: row.page
-      };
-      nodes.push(pageNode);
-    }
-    var index = nodes.indexOf(pageNode);
-  });
-
-  var planets = nodes.filter(function(node) {
-      return node.type !== 'user';
-  });
-  var freeUsers = [];
-
-  // 2. unlink users from pages if they gone away
-  planets.forEach(function(planetNode) {
-    var planetData = _.find(data, function(row) {
-      return row.page === planetNode.page;
-    });
-    var newUsersNumber = planetData ? planetData.users : 0;
-
-    var usersNearPlanet = _.filter(nodes, function(node){
-      return node.type === 'user' && node.page === planetNode.page;
-    });
-
-    for(var i = newUsersNumber; i < usersNearPlanet.length; i++) {
-      var userNode = usersNearPlanet[i];
-      if (usersNearPlanet) {
-        var planetIndex = nodes.indexOf(planetNode);
-        var userIndex = nodes.indexOf(userNode);
-        var link = _.find(links, function(l) {
-          return l.source === planetIndex && l.target === userIndex || (l.source === planetNode && l.target === userNode);
-        });
-        if (link) {
-          _.pullAt(links, links.indexOf(link));
-          freeUsers.push(userNode);
+    // 1. add new planets if required
+    data.forEach(function(row) {
+        var pageNode = nodes.filter(function(node) {
+            return node.page === row.page;
+        })[0];
+        if (!pageNode) {
+            pageNode = new Page({
+                page: row.page,
+                users: row.users
+            });
+            layer.add(pageNode.view);
+            nodes.push(pageNode);
         }
-      } else {
-        break;
-      }
-    }
-  });
+        var index = nodes.indexOf(pageNode);
+    });
 
-  // 3. link free users to another page or create new user
-  planets.forEach(function(planetNode) {
-    var planetData = _.find(data, function(row) {
-      return row.page === planetNode.page;
+    var planets = nodes.filter(function(node) {
+        return node.type !== 'user';
     });
-    var newUsersNumber = planetData ? planetData.users : 0;
-    var usersNearPlanet = _.filter(nodes, function(node){
-      return node.type === 'user' && node.page === planetNode.page;
-    });
-    for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
-      var userNode = _.pullAt(freeUsers, freeUsers.length - 1)[0];
-      var planetIndex = nodes.indexOf(planetNode);
-      if (userNode) {
-        var userIndex = nodes.indexOf(userNode);
-        userNode.page = planetNode.page;
-        links.push({source: planetIndex, target: userIndex})
-      } else {
-        userNode = {page: planetNode.page, type: 'user'};
-        nodes.push(userNode);
-        links.push({
-            source: planetIndex, target: nodes.length - 1
+    var freeUsers = [];
+
+    // 2. unlink users from pages if they gone away
+    planets.forEach(function(planetNode) {
+        var planetData = _.find(data, function(row) {
+            return row.page === planetNode.page;
         });
-      }
-    }
-  });
+        var newUsersNumber = planetData ? planetData.users : 0;
 
-  // 4. remove free unlinked users
-  freeUsers.forEach(function(userNode) {
-    _.pullAt(nodes, nodes.indexOf(userNode));
-  });
+        var usersNearPlanet = _.filter(nodes, function(node){
+            return node.type === 'user' && node.page === planetNode.page;
+        });
+
+        for(var i = newUsersNumber; i < usersNearPlanet.length; i++) {
+            var userNode = usersNearPlanet[i];
+            if (usersNearPlanet) {
+                var planetIndex = nodes.indexOf(planetNode);
+                var userIndex = nodes.indexOf(userNode);
+                var link = _.find(links, function(l) {
+                    return l.source === planetIndex && l.target === userIndex || (l.source === planetNode && l.target === userNode);
+                });
+                if (link) {
+                    _.pullAt(links, links.indexOf(link));
+                    freeUsers.push(userNode);
+                }
+            } else {
+                break;
+            }
+        }
+    });
+
+    // 3. link free users to another page or create new user
+    planets.forEach(function(planetNode) {
+        var planetData = _.find(data, function(row) {
+            return row.page === planetNode.page;
+        });
+        var newUsersNumber = planetData ? planetData.users : 0;
+        var usersNearPlanet = _.filter(nodes, function(node){
+            return node.type === 'user' && node.page === planetNode.page;
+        });
+        for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
+            var userNode = _.pullAt(freeUsers, freeUsers.length - 1)[0];
+            var planetIndex = nodes.indexOf(planetNode);
+            if (userNode) {
+                var userIndex = nodes.indexOf(userNode);
+                userNode.page = planetNode.page;
+                links.push({source: planetIndex, target: userIndex});
+            } else {
+                userNode = new User({page: planetNode.page, type: 'user'});
+                layer.add(userNode.view);
+                nodes.push(userNode);
+                links.push({
+                    source: planetIndex, target: nodes.length - 1
+                });
+            }
+        }
+    });
+
+    // 4. remove free unlinked users
+    freeUsers.forEach(function(userNode) {
+        userNode.destroy();
+        _.pullAt(nodes, nodes.indexOf(userNode));
+    });
 }
 
 function render(state) {
   // container.innerHTML = JSON.stringify(state, null, 2);
   if (state.data instanceof Array) {
       var data = _.map(state.data, function(row) {
-        return {page : row[0], users: parseInt(row[1])}
-      })
+        return {page : row[0], users: parseInt(row[1])};
+      });
       prepareNodes(data);
+      var pagesNumber = state.data.length;
+      force.gravity(pagesNumber * 0.0005 + 0.01);
       force.start();
   }
 
@@ -207,17 +239,18 @@ function update(state) {
 
 
 function getData(state, cb) {
-  gapi.client.analytics.data.realtime.get({
-    ids:state.ids,
-    metrics:state.metrics,
-    dimensions:state.dimensions
-  }).execute(function(result) {
-    cb(result.rows || 'looks like no users on site...')
-  });
+    gapi.client.analytics.data.realtime.get({
+        ids:state.ids,
+        metrics:state.metrics,
+        dimensions:state.dimensions
+    }).execute(function(result) {
+        cb(result.rows || 'looks like no users on site...');
+    });
 }
 
 function run(ids) {
   clearTimeout(updateTimeout);
+  reset();
   var delay = 5;
   var state = {
     data : {},
@@ -229,4 +262,15 @@ function run(ids) {
     dimensions:"rt:pagePath"
   };
   update(state);
+}
+
+function reset() {
+  var i = nodes.length;
+  while(i--) {
+    nodes.pop().destroy();
+  }
+  i = links.length;
+  while(i--) {
+    links.pop();
+  }
 }
