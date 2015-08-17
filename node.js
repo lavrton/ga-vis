@@ -115,23 +115,31 @@ Page.prototype._mouseEnter = function () {
     var offset = 4;
 
     this.pageText = new Konva.Text({
-        text: this.page,
+        text: 'Page: ' + this.page,
+        fontSize: 15,
         fill: 'white'
     });
-    this.pageText.x(-this.pageText.width() / 2);
-    this.pageText.y(-(this.circle.radius() + this.pageText.height() + offset));
+    // this.pageText.x(-this.pageText.width() / 2);
+    // this.pageText.y(-(this.circle.radius() + this.pageText.height() + offset));
+    this.pageText.x(layer.getWidth() - this.pageText.width() - offset);
+    this.pageText.y(offset);
 
     this.userNumberText = new Konva.Text({
-        text: 'users: ' + this.users,
+        text: 'Users: ' + this.users,
+        fontSize: 15,
         fill: 'white'
     });
-    this.userNumberText.x(-this.userNumberText.width() / 2);
-    this.userNumberText.y((this.circle.radius() + offset));
+    // this.userNumberText.x(-this.userNumberText.width() / 2);
+    // this.userNumberText.y((this.circle.radius() + offset));
 
-    this.view.add(this.pageText, this.userNumberText);
+    this.userNumberText.x(layer.getWidth() - this.userNumberText.width() - offset);
+    this.userNumberText.y(offset + this.pageText.height() + offset);
+
+    layer.add(this.pageText, this.userNumberText);
     this.circle.to({
         radius: this.circle.radius() + 3,
-        strokeWidth: this.circle.strokeWidth() + 2,
+        strokeWidth: 2,
+        stroke: 'white',
         duration: 0.2
     });
     this.view.getLayer().batchDraw();
@@ -145,6 +153,7 @@ Page.prototype._mouseLeave = function () {
     this.userNumberText.destroy();
     this.circle.to({
         radius: this.radius,
+        stroke: null,
         duration: 0.2
     });
     this.view.getLayer().batchDraw();
