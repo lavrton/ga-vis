@@ -29,7 +29,7 @@ function test() {
 
   prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
   prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
-  console.assert(nodes.length === 5);
+  console.assert(nodes.length === 4);
   console.assert(links.length === 2);
   n = _.filter(nodes, function(node) {
     return node.type === 'user' && node.page === 'home';
@@ -42,7 +42,7 @@ function test() {
   prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
   prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
   prepareNodes([{page: 'circle', users: 1}, {page: 'home', users: 3}]);
-  console.assert(nodes.length === 8);
+  console.assert(nodes.length === 6);
   reset();
 
   prepareNodes([{page: '/', users: 2}]);

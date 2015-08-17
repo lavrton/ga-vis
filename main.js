@@ -57,7 +57,9 @@ var force = d3.layout.force()
     .size([window.innerWidth, window.innerHeight])
     .gravity(0.05)
     // .distance(100)
-    .linkDistance(15)
+    .linkDistance(function(d) {
+        return d.source.radius + 5;
+    })
     .charge(-26)
     .on("tick", tick)
     .on('end', function() {force.start();})
@@ -124,17 +126,15 @@ function prepareNodes(data) {
     // 1. add new planets if required
     data.forEach(function(row) {
         var pageNode = nodes.filter(function(node) {
-            return node.page === row.page;
+            return node.page === row.page && node.type !== 'user';
         })[0];
         if (!pageNode) {
             pageNode = new Page({
-                page: row.page,
-                users: row.users
+                page: row.page
             });
             layer.add(pageNode.view);
             nodes.push(pageNode);
         }
-        var index = nodes.indexOf(pageNode);
     });
 
     var planets = nodes.filter(function(node) {
@@ -148,6 +148,7 @@ function prepareNodes(data) {
             return row.page === planetNode.page;
         });
         var newUsersNumber = planetData ? planetData.users : 0;
+        planetNode.users = newUsersNumber;
 
         var usersNearPlanet = _.filter(nodes, function(node){
             return node.type === 'user' && node.page === planetNode.page;
@@ -156,10 +157,8 @@ function prepareNodes(data) {
         for(var i = newUsersNumber; i < usersNearPlanet.length; i++) {
             var userNode = usersNearPlanet[i];
             if (usersNearPlanet) {
-                var planetIndex = nodes.indexOf(planetNode);
-                var userIndex = nodes.indexOf(userNode);
                 var link = _.find(links, function(l) {
-                    return l.source === planetIndex && l.target === userIndex || (l.source === planetNode && l.target === userNode);
+                    return l.source === planetNode && l.target === userNode;
                 });
                 if (link) {
                     _.pullAt(links, links.indexOf(link));
@@ -182,17 +181,15 @@ function prepareNodes(data) {
         });
         for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
             var userNode = _.pullAt(freeUsers, freeUsers.length - 1)[0];
-            var planetIndex = nodes.indexOf(planetNode);
             if (userNode) {
-                var userIndex = nodes.indexOf(userNode);
                 userNode.page = planetNode.page;
-                links.push({source: planetIndex, target: userIndex});
+                links.push({source: planetNode, target: userNode});
             } else {
                 userNode = new User({page: planetNode.page, type: 'user'});
                 layer.add(userNode.view);
                 nodes.push(userNode);
                 links.push({
-                    source: planetIndex, target: nodes.length - 1
+                    source: planetNode, target: userNode
                 });
             }
         }
@@ -202,6 +199,14 @@ function prepareNodes(data) {
     freeUsers.forEach(function(userNode) {
         userNode.destroy();
         _.pullAt(nodes, nodes.indexOf(userNode));
+    });
+
+    // 5. remove pages without user
+    planets.forEach(function(planet) {
+        if (planet.users === 0) {
+            planet.destroy();
+            _.pullAt(nodes, nodes.indexOf(planet));
+        }
     });
 }
 
