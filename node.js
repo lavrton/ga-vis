@@ -90,8 +90,9 @@ Page.prototype._createView = function() {
     this.circle.fillRadialGradientColorStops([0, darker(color), 0.7, color, 1, 'rgba(0,0,255,0.3)']);
     // this.circle.fill(this.circle.colorKey);
     this.view.add(this.circle);
-    this.view.on('mouseenter', this._mouseEnter.bind(this));
-    this.view.on('mouseleave', this._mouseLeave.bind(this));
+
+    this.view.on('click tap', this._showDetails.bind(this));
+
     this.view.on('dragstart', function() {
         this.fixed = true;
     }.bind(this));
@@ -110,7 +111,12 @@ Page.prototype._createView = function() {
     this.view.cache();
 };
 
-Page.prototype._mouseEnter = function () {
+Page.prototype._showDetails = function () {
+    if (this.selected) {
+        return;
+    }
+    hideDetails();
+    this.selected = true;
     this.view.clearCache();
     var offset = 4;
 
@@ -145,7 +151,32 @@ Page.prototype._mouseEnter = function () {
     this.view.getLayer().batchDraw();
 };
 
-Page.prototype._mouseLeave = function () {
+var background = new Konva.Shape({
+    opacity: 0.01,
+    sceneFunc: function(ctx) {
+        ctx.beginPath();
+        ctx.rect(0,0, this.getLayer().getWidth(), this.getLayer().getHeight());
+        ctx.closePath();
+        ctx.fillStrokeShape(this);
+    }
+});
+
+layer.add(background);
+background.on('click tap', hideDetails);
+
+function hideDetails() {
+    var node = _.find(nodes, function(node) {
+        return node.selected;
+    });
+    console.log('click on back');
+    if (!node) {
+        return;
+    }
+    node.hideDetails();
+}
+
+Page.prototype.hideDetails = function () {
+    this.selected = false;
     if (!this.pageText || !this.userNumberText) {
         return;
     }
