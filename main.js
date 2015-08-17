@@ -1,24 +1,24 @@
-gapi.analytics.ready(function() {
-
-    var CLIENT_ID = '32030338980-jop5s699r3elkk1p0k17ceeugbqkka0n.apps.googleusercontent.com';
-
-    gapi.analytics.auth.authorize({
-      container: 'auth-button',
-      clientid: CLIENT_ID,
-    });
-
-    var viewSelector = new gapi.analytics.ViewSelector({
-      container: 'view-selector'
-    });
-
-    gapi.analytics.auth.on('success', function(response) {
-      viewSelector.execute();
-    });
-
-    viewSelector.on('change', function(ids) {
-        run(ids);
-    });
-});
+// gapi.analytics.ready(function() {
+//
+//     var CLIENT_ID = '32030338980-jop5s699r3elkk1p0k17ceeugbqkka0n.apps.googleusercontent.com';
+//
+//     gapi.analytics.auth.authorize({
+//       container: 'auth-button',
+//       clientid: CLIENT_ID,
+//     });
+//
+//     var viewSelector = new gapi.analytics.ViewSelector({
+//       container: 'view-selector'
+//     });
+//
+//     gapi.analytics.auth.on('success', function(response) {
+//       viewSelector.execute();
+//     });
+//
+//     viewSelector.on('change', function(ids) {
+//         run(ids);
+//     });
+// });
 
 
 // var container = document.getElementById('data');
@@ -244,11 +244,14 @@ function update(state) {
 
 
 function getData(state, cb) {
-    gapi.client.analytics.data.realtime.get({
-        ids:state.ids,
-        metrics:state.metrics,
-        dimensions:state.dimensions
-    }).execute(function(result) {
+    // gapi.client.analytics.data.realtime.get({
+    //     ids:state.ids,
+    //     metrics:state.metrics,
+    //     dimensions:state.dimensions
+    // }).execute(function(result) {
+    //     cb(result.rows || 'looks like no users on site...');
+    // });
+    JSONP('https://tbbtco.appspot.com/query?id=aghzfnRiYnRjb3IVCxIIQXBpUXVlcnkYgICAgICAgAoM', function(result) {
         cb(result.rows || 'looks like no users on site...');
     });
 }
@@ -279,3 +282,20 @@ function reset() {
     links.pop();
   }
 }
+
+
+function loadJSON(url, callback) {
+
+    var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+    xobj.open('GET', url, true); // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);
+ }
+
+ run();

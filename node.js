@@ -168,7 +168,7 @@ function hideDetails() {
     var node = _.find(nodes, function(node) {
         return node.selected;
     });
-    console.log('click on back');
+
     if (!node) {
         return;
     }
