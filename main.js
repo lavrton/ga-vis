@@ -256,7 +256,7 @@ function getData(state, cb) {
         cb([]);
         return;
     }
-    JSONP(url, function(result) {
+    JSONP(url + '&time='+Math.random(), function(result) {
         cb(result.rows || 'looks like no users on site...');
     });
 }

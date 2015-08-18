@@ -32,9 +32,6 @@ Node.prototype.update = function() {
 Node.prototype.destroy = function() {
     this.view.to({
         opacity: 0,
-        y: -50,
-        scaleX : 0,
-        scaleY: 0,
         onFinish: function() {
             this.view.destroy();
         }.bind(this)
@@ -61,6 +58,15 @@ function Page(data) {
 
 Page.prototype = Object.create(Node.prototype);
 
+Page.prototype.destroy = function () {
+    Node.prototype.destroy.call(this);
+    // explose!!!!
+    this.view.clearCache();
+    this.view.children[0].to({
+        scaleX: 3,
+        scaleY: 3,
+    });
+};
 Page.prototype._isValuable = function() {
     var words = ['checkout', 'payment','registration', 'signup'];
     var contain = _.find(words, function(word) {
@@ -87,7 +93,7 @@ Page.prototype._createView = function() {
         strokeHitEnabled: false
     });
     var color = this.circle.colorKey;
-    this.circle.fillRadialGradientColorStops([0, darker(color), 0.7, color, 1, 'rgba(0,0,255,0.3)']);
+    this.circle.fillRadialGradientColorStops([0, darker(color), 0.8, color, 1, 'rgba(0,0,0,0.3)']);
     // this.circle.fill(this.circle.colorKey);
     this.view.add(this.circle);
 
@@ -185,7 +191,12 @@ Page.prototype.hideDetails = function () {
     this.circle.to({
         radius: this.radius,
         stroke: null,
-        duration: 0.2
+        duration: 0.2,
+        onFinish: function() {
+            this.view.remove();
+            this.view.cache();
+            layer.add(this.view);
+        }.bind(this)
     });
     this.view.getLayer().batchDraw();
 };
