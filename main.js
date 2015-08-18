@@ -251,7 +251,12 @@ function getData(state, cb) {
     // }).execute(function(result) {
     //     cb(result.rows || 'looks like no users on site...');
     // });
-    JSONP('https://tbbtco.appspot.com/query?id=aghzfnRiYnRjb3IVCxIIQXBpUXVlcnkYgICAgICAgAoM', function(result) {
+    var url = window.location.search.replace("?url=", "");
+    if (!url) {
+        cb([]);
+        return;
+    }
+    JSONP(url, function(result) {
         cb(result.rows || 'looks like no users on site...');
     });
 }
@@ -259,13 +264,13 @@ function getData(state, cb) {
 function run(ids) {
   clearTimeout(updateTimeout);
   reset();
-  var delay = 5;
+  var delay = 15;
   var state = {
     data : {},
     ids: ids,
     delay: delay,
     timeLeft: delay,
-    updateTimeLeft: 20,
+    updateTimeLeft: 99999999,
     metrics: "rt:activeUsers",
     dimensions:"rt:pagePath"
   };
@@ -282,20 +287,5 @@ function reset() {
     links.pop();
   }
 }
-
-
-function loadJSON(url, callback) {
-
-    var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-    xobj.open('GET', url, true); // Replace 'my_data' with the path to your file
-    xobj.onreadystatechange = function () {
-          if (xobj.readyState == 4 && xobj.status == "200") {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
-          }
-    };
-    xobj.send(null);
- }
 
  run();
