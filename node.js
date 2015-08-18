@@ -60,12 +60,22 @@ Page.prototype = Object.create(Node.prototype);
 
 Page.prototype.destroy = function () {
     Node.prototype.destroy.call(this);
+    if (this.selected) {
+        hideDetails();
+    }
     // explose!!!!
     this.view.clearCache();
     this.view.children[0].to({
         scaleX: 3,
         scaleY: 3,
     });
+};
+
+Page.prototype.update = function () {
+    Node.prototype.update.call(this);
+    if (this.userNumberText) {
+        this.userNumberText.text('Users: ' + this.users);
+    }
 };
 Page.prototype._isValuable = function() {
     var words = ['checkout', 'payment','registration', 'signup'];
@@ -131,8 +141,7 @@ Page.prototype._showDetails = function () {
         fontSize: 15,
         fill: 'white'
     });
-    // this.pageText.x(-this.pageText.width() / 2);
-    // this.pageText.y(-(this.circle.radius() + this.pageText.height() + offset));
+
     this.pageText.x(layer.getWidth() - this.pageText.width() - offset);
     this.pageText.y(offset);
 
@@ -141,15 +150,13 @@ Page.prototype._showDetails = function () {
         fontSize: 15,
         fill: 'white'
     });
-    // this.userNumberText.x(-this.userNumberText.width() / 2);
-    // this.userNumberText.y((this.circle.radius() + offset));
 
     this.userNumberText.x(layer.getWidth() - this.userNumberText.width() - offset);
     this.userNumberText.y(offset + this.pageText.height() + offset);
 
     layer.add(this.pageText, this.userNumberText);
     this.circle.to({
-        radius: this.circle.radius() + 3,
+        radius: this.circle.radius(),
         strokeWidth: 2,
         stroke: 'white',
         duration: 0.2
@@ -188,9 +195,10 @@ Page.prototype.hideDetails = function () {
     }
     this.pageText.destroy();
     this.userNumberText.destroy();
+    this.userNumberText = null;
     this.circle.to({
-        radius: this.radius,
-        stroke: null,
+        stroke: 'rgba(0,0,0,0)',
+        strokeWidth: 0,
         duration: 0.2,
         onFinish: function() {
             this.view.remove();
