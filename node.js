@@ -232,23 +232,37 @@ User.prototype.update = function () {
     } else {
         this.tail.points([0,0, dx * 2, dy * 2]);
     }
+    // if (this.selected) {
+    //     var scale = 1.5;
+    //     layer.x(-this.x + (layer.width() / 2 * scale));
+    //     layer.y(-this.y + (layer.height() / 2 * scale));
+    //     layer.scaleX(scale);
+    //     layer.scaleY(scale);
+    // }
 
 };
 
 User.prototype._createView = function() {
     this.view = new Konva.Group({
         transformsEnabled: 'position',
-        listening: false
+        // listening: false
     });
     this.circle = new Konva.Circle({
         radius: 2,
         fill: '#a8d3e7',
-        listening: false
+        listening: false,
+    });
+    this.hit = new Konva.Circle({
+        radius: 5,
+        fill: 'rgba(100,100,100,0.5)',
     });
     this.tail = new Konva.Line({
         points : [],
         stroke: '#a8d3e7',
         opacity: 0.3
     });
-    this.view.add(this.circle, this.tail);
+    this.view.add(this.hit, this.circle, this.tail);
+    this.view.on('click tap', function() {
+        this.selected = true;
+    }.bind(this));
 };

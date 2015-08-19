@@ -256,7 +256,7 @@ function getData(state, cb) {
         cb([]);
         return;
     }
-    JSONP(url + '&time='+Math.random(), function(result) {
+    loadJSON(url, function(result) {
         cb(result.rows || 'looks like no users on site...');
     });
 }
@@ -289,3 +289,25 @@ function reset() {
 }
 
  run();
+
+
+ function loadJSON(path, success, error)
+ {
+     var xhr = new XMLHttpRequest();
+     xhr.onreadystatechange = function()
+     {
+         if (xhr.readyState === XMLHttpRequest.DONE) {
+             if (xhr.status === 200) {
+                 if (success)
+                     success(JSON.parse(xhr.responseText));
+             } else {
+                 if (error)
+                     error(xhr);
+             }
+         }
+     };
+     xhr.open("GET", path, true);
+     xhr.send();
+ }
+
+ // loadJSON('https://tbbtco.appspot.com/query?id=aghzfnRiYnRjb3IVCxIIQXBpUXVlcnkYgICAgICAgAoM', console.log.bind(console));
