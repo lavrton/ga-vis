@@ -231,6 +231,11 @@ User.prototype.update = function () {
     } else {
         this.tail.points([0,0, dx * 2, dy * 2]);
     }
+    if (this.type === 'NEW') {
+        this.circle.fill('#a8d3e7');
+    } else {
+        this.circle.fill('#b2e7a7');
+    }
     // if (this.selected) {
     //     var scale = 1.5;
     //     layer.x(-this.x + (layer.width() / 2 * scale));
