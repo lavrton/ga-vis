@@ -69,30 +69,6 @@ window.addEventListener('resize', function updateForceSize() {
     force.size([window.innerWidth, window.innerHeight]);
 });
 
-// var fontSize = 5;
-// var maxChars = 23;
-// function drawPage(context, data) {
-//   var title = data.page;
-//
-//   if (title.length > maxChars) {
-//     title = title.slice(0, maxChars - 5) + '..' + title.slice(title.length - 3, title.length);
-//   }
-//   context.beginPath();
-//   context.arc(data.x, data.y, title.length * fontSize / 2 + 4, 0, 2 * Math.PI);
-//   context.closePath();
-//   context.fillStyle = 'white';
-//   context.fill();
-//   context.fillStyle = 'grey';
-//   context.fillText(title, data.x - title.length * fontSize / 2.2, data.y + fontSize / 2);
-// }
-//
-// function drawUser(context, data) {
-//   context.beginPath();
-//   context.arc(data.x, data.y, 3, 0, 2 * Math.PI);
-//   context.closePath();
-//   context.fillStyle = 'yellow';
-//   context.fill();
-// }
 
 function tick(e) {
 
@@ -138,61 +114,106 @@ function prepareNodes(data) {
     });
 
     var planets = nodes.filter(function(node) {
-        return node.type !== 'user';
+        return !node.isUser;
     });
     var freeUsers = [];
+    // reset user count
+    _.forEach(planets, function(planet) {
+        planet.users = 0;
+        var planetDatas = _.filter(data, function(row) {
+            return planet.page === row.page;
+        });
+        planetDatas.forEach(function(planetData) {
+            planet.users += planetData.users;
+        });
+        if (planet.users === 0) {
+            var usersNearPlanet = _.filter(nodes, function(node){
+                return node.isUser === true &&
+                    node.page === planet.page;
+            });
+            freeUsers = freeUsers.concat(usersNearPlanet);
+            // unlink users
+            usersNearPlanet.forEach(function(user) {
+                var link = _.find(links, function(l) {
+                    return l.source === planet && l.target === user;
+                });
+                _.pullAt(links, links.indexOf(link));
+            });
+        }
+    });
+
 
     // 2. unlink users from pages if they gone away
     planets.forEach(function(planetNode) {
-        var planetData = _.find(data, function(row) {
+        var planetDatas = _.filter(data, function(row) {
             return row.page === planetNode.page;
         });
-        var newUsersNumber = planetData ? planetData.users : 0;
-        planetNode.users = newUsersNumber;
+        planetDatas.forEach(function(planetData) {
+            var newUsersNumber = planetData ? planetData.users : 0;
 
-        var usersNearPlanet = _.filter(nodes, function(node){
-            return node.type === 'user' && node.page === planetNode.page;
-        });
+            var usersNearPlanet = _.filter(nodes, function(node){
+                return node.isUser === true &&
+                    node.page === planetNode.page &&
+                    node.type === planetData.type &&
+                    node.device === planetData.device;
+            });
 
-        for(var i = newUsersNumber; i < usersNearPlanet.length; i++) {
-            var userNode = usersNearPlanet[i];
-            if (usersNearPlanet) {
-                var link = _.find(links, function(l) {
-                    return l.source === planetNode && l.target === userNode;
-                });
-                if (link) {
-                    _.pullAt(links, links.indexOf(link));
-                    freeUsers.push(userNode);
+            for(var i = newUsersNumber; i < usersNearPlanet.length; i++) {
+                var userNode = usersNearPlanet[i];
+                if (usersNearPlanet) {
+                    var link = _.find(links, function(l) {
+                        return l.source === planetNode && l.target === userNode;
+                    });
+                    if (link) {
+                        _.pullAt(links, links.indexOf(link));
+                        freeUsers.push(userNode);
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
-        }
+        });
     });
 
     // 3. link free users to another page or create new user
     planets.forEach(function(planetNode) {
-        var planetData = _.find(data, function(row) {
+        var planetDatas = _.filter(data, function(row) {
             return row.page === planetNode.page;
         });
-        var newUsersNumber = planetData ? planetData.users : 0;
-        var usersNearPlanet = _.filter(nodes, function(node){
-            return node.type === 'user' && node.page === planetNode.page;
-        });
-        for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
-            var userNode = _.pullAt(freeUsers, freeUsers.length - 1)[0];
-            if (userNode) {
-                userNode.page = planetNode.page;
-                links.push({source: planetNode, target: userNode});
-            } else {
-                userNode = new User({page: planetNode.page, type: 'user'});
-                layer.add(userNode.view);
-                nodes.push(userNode);
-                links.push({
-                    source: planetNode, target: userNode
+        planetDatas.forEach(function(planetData) {
+            var newUsersNumber = planetData ? planetData.users : 0;
+            var usersNearPlanet = _.filter(nodes, function(node){
+                return node.isUser === true &&
+                    node.page === planetNode.page &&
+                    node.type === planetData.type &&
+                    node.device === planetData.device;
+            });
+            for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
+                var userNode = _.find(freeUsers, function(freeUser) {
+                    return freeUser.page === planetNode.page &&
+                        freeUser.type === planetData.type &&
+                        freeUser.device === planetData.device;
                 });
+
+                if (userNode) {
+                    _.pullAt(freeUsers, freeUsers.indexOf(userNode));
+                    userNode.page = planetNode.page;
+                    links.push({source: planetNode, target: userNode});
+                } else {
+                    userNode = new User({
+                        page: planetNode.page,
+                        isUser: true,
+                        type: planetData.type,
+                        device: planetData.device
+                    });
+                    layer.add(userNode.view);
+                    nodes.push(userNode);
+                    links.push({
+                        source: planetNode, target: userNode
+                    });
+                }
             }
-        }
+        });
     });
 
     // 4. remove free unlinked users
@@ -214,7 +235,12 @@ function render(state) {
   // container.innerHTML = JSON.stringify(state, null, 2);
   if (state.data instanceof Array) {
       var data = _.map(state.data, function(row) {
-        return {page : row[0], users: parseInt(row[1])};
+        return {
+            type: row[0],
+            page : row[1],
+            device: row[2],
+            users: parseInt(row[3])
+        };
       });
       prepareNodes(data);
       var pagesNumber = state.data.length;
@@ -257,7 +283,14 @@ function getData(state, cb) {
         return;
     }
     loadJSON(url, function(result) {
-        cb(result.rows || 'looks like no users on site...');
+        if (result.columnHeaders.length === 2) {
+            var rows = _.map(result.rows || [], function(row) {
+                return ['NEW', row[0], 'DESKTOP', row[1]];
+            });
+            cb(rows);
+        } else {
+            cb(result.rows || []);
+        }
     });
 }
 

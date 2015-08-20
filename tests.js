@@ -15,7 +15,7 @@ function test() {
   prepareNodes([{page: 'hello', users: 10}, {page: 'about', users: 2}]);
   console.assert(nodes.length === 14);
   var n = _.filter(nodes, function(node) {
-    return node.type === 'user' && node.page === 'hello';
+    return node.isUser && node.page === 'hello';
   }).length;
   console.assert(n === 10);
   reset();
@@ -32,7 +32,7 @@ function test() {
   console.assert(nodes.length === 4);
   console.assert(links.length === 2);
   n = _.filter(nodes, function(node) {
-    return node.type === 'user' && node.page === 'home';
+    return node.isUser && node.page === 'home';
   }).length;
   console.assert(n === 1);
   reset();
@@ -54,13 +54,17 @@ function test() {
 var PAGES = 10;
 var USERS = 50;
 function generateData() {
-  reset();
+  // reset();
   var data = [];
+  var types = ['NEW', 'RETURNING'];
+  var devices = ['DESKTOP', 'MOBILE', 'TABLET'];
   for (var i = 0; i < PAGES; i++) {
     data.push({
       page : 'page with long links so be ready' + i,
-      users: Math.round(Math.random() * USERS)
-  });
+      users: Math.round(Math.random() * USERS),
+      type: _.sample(types),
+      device: _.sample(devices),
+    });
   }
   prepareNodes(data);
   force.gravity(PAGES * 0.0005 + 0.01);

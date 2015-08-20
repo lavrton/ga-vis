@@ -47,7 +47,6 @@ Node.prototype._animateAppending = function () {
 
 
 function Page(data) {
-    this.type = 'page';
     this.radius = 20 + Math.random() * 20;
     Node.call(this, data);
 
@@ -212,7 +211,7 @@ Page.prototype.hideDetails = function () {
 
 function User(data) {
     Node.call(this, data);
-    this.type = 'user';
+    this.isUser = true;
     var directrion = Math.random() > 0.5 ? -1 : 1;
     this.speed = directrion * (Math.random() * 0.006 + 0.001);
 }
@@ -252,16 +251,16 @@ User.prototype._createView = function() {
         fill: '#a8d3e7',
         listening: false,
     });
-    this.hit = new Konva.Circle({
-        radius: 5,
-        fill: 'rgba(100,100,100,0.5)',
-    });
+    // this.hit = new Konva.Circle({
+    //     radius: 5,
+    //     fill: 'rgba(100,100,100,0.5)',
+    // });
     this.tail = new Konva.Line({
         points : [],
         stroke: '#a8d3e7',
         opacity: 0.3
     });
-    this.view.add(this.hit, this.circle, this.tail);
+    this.view.add(this.circle, this.tail);
     this.view.on('click tap', function() {
         this.selected = true;
     }.bind(this));
