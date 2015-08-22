@@ -99,6 +99,34 @@ function tick(e) {
 }
 
 function prepareNodes(data) {
+    // 0 clear query data like about/?query=1
+    var newdata = [];
+    data.forEach(function(row) {
+        var page = row.page.split("?")[0];
+        if (page[page.length - 1] === '/') {
+            page = page.slice(0, page.length - 1);
+        }
+        row.page = page;
+    });
+
+    // join same rows
+    var checked = [];
+    data.forEach(function(row) {
+        var same = _.find(checked, function(r) {
+            return  r.page === row.page &&
+                    r.type === row.type &&
+                    r.device === row.device;
+        });
+        if (same) {
+            same.users += row.users;
+        } else {
+            checked.push(row);
+        }
+    });
+    data = checked;
+
+    //
+
     // 1. add new planets if required
     data.forEach(function(row) {
         var pageNode = nodes.filter(function(node) {

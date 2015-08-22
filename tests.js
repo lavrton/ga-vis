@@ -49,6 +49,16 @@ function test() {
   prepareNodes([{page: '/', users: 1}]);
   console.assert(nodes.length === 2);
   reset();
+
+  prepareNodes([{
+      page: '/about', users: 2
+  },{
+      page: '/about/?query=1', users: 1
+  },{
+      page: '/about?query=1', users: 1
+  }]);
+  console.assert(nodes.length === 5);
+  reset();
 }
 
 var PAGES = 10;
