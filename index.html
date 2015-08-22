@@ -21,10 +21,20 @@
       position: absolute;
       top:0;
     }
+    #showinfo:hover #info{
+        display : block;
+    }
+    #showinfo {
+        font-size: 30px;
+    }
     #info {
+        display: none;
+        font-size: 16px;
+    }
+    #infoPanel {
         position: absolute;
-        left: 0;
-        bottom: 0;
+        left: 5px;
+        top: 3px;
         color: white;
     }
     </style>
@@ -37,12 +47,16 @@
         <pre id="data"></pre>
       </section>
     </div>
-    <div id="info">
-        User colors:
-        <span style="color: #e3935f">desktop</span>,
-        <span style="color: #64bbe3">tablet</span>,
-        <span style="color: #7ce267">mobile</span>.
-
+    <div id="infoPanel">
+        <div id="showinfo">
+             ?
+            <div id="info">
+                User colors:
+                <span style="color: #e3935f">desktop</span>,
+                <span style="color: #64bbe3">tablet</span>,
+                <span style="color: #7ce267">mobile</span>.
+            </div>
+        </div>
     </div>
     <!-- <div id="controls">
         Pages: <input type="range" min="1" max="100" step="1" value="3" id="pagesInput"></input>
