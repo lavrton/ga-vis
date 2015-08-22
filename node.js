@@ -231,10 +231,12 @@ User.prototype.update = function () {
     } else {
         this.tail.points([0,0, dx * 2, dy * 2]);
     }
-    if (this.type === 'NEW') {
-        this.circle.fill('#a8d3e7');
+    if (this.device === 'DESKTOP') {
+        this.circle.fill('#e3935f');
+    } else if (this.device === 'TABLET'){
+        this.circle.fill('#64bbe3');
     } else {
-        this.circle.fill('#b2e7a7');
+        this.circle.fill('#7ce267');
     }
     // if (this.selected) {
     //     var scale = 1.5;
@@ -249,12 +251,12 @@ User.prototype.update = function () {
 User.prototype._createView = function() {
     this.view = new Konva.Group({
         transformsEnabled: 'position',
-        // listening: false
+        listening: false
     });
     this.circle = new Konva.Circle({
         radius: 2,
         fill: '#a8d3e7',
-        listening: false,
+        // listening: false,
     });
     // this.hit = new Konva.Circle({
     //     radius: 5,
