@@ -81,7 +81,7 @@ function generateData() {
   force.start();
 }
 
-test();
+// test();
 
 
 // var pagesInput = document.getElementById('pagesInput');

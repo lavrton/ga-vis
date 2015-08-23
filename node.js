@@ -47,12 +47,14 @@ Node.prototype._animateAppending = function () {
 
 
 function Page(data) {
-    this.radius = 20 + Math.random() * 20;
+    this.radius = 20 + Math.random() * 5;
     Node.call(this, data);
-
     if (this._isValuable()) {
-        this.radius += 10;
+        this.radius += 15;
+        this._createView();
     }
+
+
 }
 
 Page.prototype = Object.create(Node.prototype);
@@ -77,14 +79,21 @@ Page.prototype.update = function () {
     }
 };
 Page.prototype._isValuable = function() {
-    var words = ['checkout', 'payment','registration', 'signup'];
+    var words = getParameterByName('words') || '';
+    words = words.split(',');
+
     var contain = _.find(words, function(word) {
         return this.page.indexOf(word) > -1;
     }.bind(this));
+
     return !!contain;
 };
 
 Page.prototype._createView = function() {
+    // delete previous view
+    this.view && this.view.destroy();
+
+    // create new
     this.view = new Konva.Group({
         transformsEnabled: 'position',
         draggable: true

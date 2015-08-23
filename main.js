@@ -305,7 +305,7 @@ function getData(state, cb) {
     // }).execute(function(result) {
     //     cb(result.rows || 'looks like no users on site...');
     // });
-    var url = window.location.search.replace("?url=", "");
+    var url = getParameterByName('url');
     if (!url) {
         cb([]);
         return;
@@ -371,4 +371,9 @@ function reset() {
      xhr.send();
  }
 
- // loadJSON('https://tbbtco.appspot.com/query?id=aghzfnRiYnRjb3IVCxIIQXBpUXVlcnkYgICAgICAgAoM', console.log.bind(console));
+ function getParameterByName(name) {
+     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+         results = regex.exec(location.search);
+     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+ }
