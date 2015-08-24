@@ -103,7 +103,7 @@ function prepareNodes(data) {
     var newdata = [];
     data.forEach(function(row) {
         var page = row.page.split("?")[0];
-        if (page[page.length - 1] === '/') {
+        if (page[page.length - 1] === '/' && page.length > 1) {
             page = page.slice(0, page.length - 1);
         }
         row.page = page;
