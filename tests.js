@@ -61,8 +61,8 @@ function test() {
   reset();
 }
 
-var PAGES = 10;
-var USERS = 50;
+var PAGES = 5;
+var USERS = 10;
 function generateData() {
   // reset();
   var data = [];
