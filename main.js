@@ -227,9 +227,8 @@ function prepareNodes(data) {
                 });
                 for(var i = usersNearPlanet.length; i < newUsersNumber; i++ ) {
                     var userNode = _.find(freeUsers, function(freeUser) {
-                        return freeUser.page === planetNode.page &&
-                            freeUser.type === planetData.type &&
-                            freeUser.device === planetData.device;
+                        return  freeUser.type === planetData.type &&
+                                freeUser.device === planetData.device;
                     });
 
                     if (userNode) {
@@ -271,7 +270,7 @@ function prepareNodes(data) {
             }
         });
         force.start();
-    }, 2500);
+    }, 4500);
 }
 
 function render(state) {
@@ -322,7 +321,7 @@ function getData(state, cb) {
     // });
     var url = getParameterByName('url');
     if (!url) {
-        cb([]);
+        cb(generateData());
         return;
     }
     loadJSON(url, function(result) {
@@ -364,7 +363,7 @@ function reset() {
   }
 }
 
- run();
+ setTimeout(run, 500);
 
 
  function loadJSON(path, success, error)
@@ -391,4 +390,26 @@ function reset() {
      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
          results = regex.exec(location.search);
      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+ }
+
+
+ function generateData() {
+     var PAGES = 5;
+     var USERS = 10;
+     // reset();
+     var data = [];
+     var types = ['NEW'/*, 'RETURNING'*/];
+     var devices = ['DESKTOP'/*, 'MOBILE', 'TABLET'*/];
+     for (var i = 0; i < PAGES; i++) {
+       data.push([
+       /*type*/ _.sample(types),
+       /*page*/ 'page with long links so be ready' + Math.random(),
+       /*device:*/ _.sample(devices),
+       /*users*/ Math.round(Math.random() * USERS),
+        ]);
+   }
+   // prepareNodes(data);
+   // force.gravity(PAGES * 0.0005 + 0.01);
+   // force.start();
+   return data;
  }

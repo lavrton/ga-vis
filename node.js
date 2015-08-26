@@ -66,10 +66,12 @@ Page.prototype.destroy = function () {
     }
     // explose!!!!
     this.view.clearCache();
-    this.view.children[0].to({
-        scaleX: 3,
-        scaleY: 3,
-    });
+    if (this.view.children[0]) {
+        this.view.children[0].to({
+            scaleX: 3,
+            scaleY: 3
+        });
+    }
 };
 
 Page.prototype.update = function () {
@@ -147,7 +149,7 @@ Page.prototype._showDetails = function () {
     this.pageText = new Konva.Text({
         text: 'Page: ' + this.page,
         fontSize: 15,
-        fill: 'white'
+        fill: 'grey'
     });
 
     this.pageText.x(layer.getWidth() - this.pageText.width() - offset);
@@ -156,7 +158,7 @@ Page.prototype._showDetails = function () {
     this.userNumberText = new Konva.Text({
         text: 'Users: ' + this.users,
         fontSize: 15,
-        fill: 'white'
+        fill: 'grey'
     });
 
     this.userNumberText.x(layer.getWidth() - this.userNumberText.width() - offset);

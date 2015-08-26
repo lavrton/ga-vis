@@ -1,85 +1,83 @@
 function test() {
-  prepareNodes([{page: 'hello', users: 1}]);
-  console.assert(nodes.length === 2);
-  reset();
-
-
-  prepareNodes([{page: 'hello', users: 2}, {page: 'about', users: 1}]);
-  console.assert(nodes.length === 5);
-  reset();
-
-  prepareNodes([{page: 'hello', users: 1}, {page: 'about', users: 1}]);
-  console.assert(nodes.length === 4);
-  reset();
-
-  prepareNodes([{page: 'hello', users: 10}, {page: 'about', users: 2}]);
-  console.assert(nodes.length === 14);
-  var n = _.filter(nodes, function(node) {
-    return node.isUser && node.page === 'hello';
-  }).length;
-  console.assert(n === 10);
-  reset();
-
-
-  prepareNodes([{page: 'hello', users: 2}, {page: 'about', users: 1}]);
-  prepareNodes([{page: 'hello', users: 1}, {page: 'about', users: 2}]);
-  console.assert(nodes.length === 5);
-  reset();
-
-
-  prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
-  prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
-  console.assert(nodes.length === 4);
-  console.assert(links.length === 2);
-  n = _.filter(nodes, function(node) {
-    return node.isUser && node.page === 'home';
-  }).length;
-  console.assert(n === 1);
-  reset();
-
-
-  prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
-  prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
-  prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
-  prepareNodes([{page: 'circle', users: 1}, {page: 'home', users: 3}]);
-  console.assert(nodes.length === 6);
-  reset();
-
-  prepareNodes([{page: '/', users: 2}]);
-  prepareNodes([{page: '/', users: 1}]);
-  console.assert(nodes.length === 2);
-  reset();
-
-  prepareNodes([{
-      page: '/about', users: 2
-  },{
-      page: '/about/?query=1', users: 1
-  },{
-      page: '/about?query=1', users: 1
-  }]);
-  console.assert(nodes.length === 5);
-  reset();
-}
-
-var PAGES = 5;
-var USERS = 10;
-function generateData() {
+  // prepareNodes([{page: 'hello', users: 1}]);
+  // console.assert(nodes.length === 2);
   // reset();
-  var data = [];
-  var types = ['NEW', 'RETURNING'];
-  var devices = ['DESKTOP', 'MOBILE', 'TABLET'];
-  for (var i = 0; i < PAGES; i++) {
-    data.push({
-      page : 'page with long links so be ready' + i,
-      users: Math.round(Math.random() * USERS),
-      type: _.sample(types),
-      device: _.sample(devices),
-    });
-  }
-  prepareNodes(data);
-  force.gravity(PAGES * 0.0005 + 0.01);
-  force.start();
+  //
+  //
+  // prepareNodes([{page: 'hello', users: 2}, {page: 'about', users: 1}]);
+  // console.assert(nodes.length === 5);
+  // reset();
+  //
+  // prepareNodes([{page: 'hello', users: 1}, {page: 'about', users: 1}]);
+  // console.assert(nodes.length === 4);
+  // reset();
+  //
+  // prepareNodes([{page: 'hello', users: 10}, {page: 'about', users: 2}]);
+  // console.assert(nodes.length === 14);
+  // var n = _.filter(nodes, function(node) {
+  //   return node.isUser && node.page === 'hello';
+  // }).length;
+  // console.assert(n === 10);
+  // reset();
+  //
+  //
+  // prepareNodes([{page: 'hello', users: 2}, {page: 'about', users: 1}]);
+  // prepareNodes([{page: 'hello', users: 1}, {page: 'about', users: 2}]);
+  // console.assert(nodes.length === 5);
+  // reset();
+  //
+  //
+  // prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
+  // prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
+  // console.assert(nodes.length === 4);
+  // console.assert(links.length === 2);
+  // n = _.filter(nodes, function(node) {
+  //   return node.isUser && node.page === 'home';
+  // }).length;
+  // console.assert(n === 1);
+  // reset();
+  //
+  //
+  // prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
+  // prepareNodes([{page: '/', users: 1}, {page: 'home', users: 1}]);
+  // prepareNodes([{page: '/', users: 1}, {page: 'about', users: 1}]);
+  // prepareNodes([{page: 'circle', users: 1}, {page: 'home', users: 3}]);
+  // console.assert(nodes.length === 6);
+  // reset();
+  //
+  // prepareNodes([{page: '/', users: 2}]);
+  // prepareNodes([{page: '/', users: 1}]);
+  // console.assert(nodes.length === 2);
+  // reset();
+  //
+  // prepareNodes([{
+  //     page: '/about', users: 2
+  // },{
+  //     page: '/about/?query=1', users: 1
+  // },{
+  //     page: '/about?query=1', users: 1
+  // }]);
+  // console.assert(nodes.length === 5);
+  // reset();
+
+    prepareNodes([{
+        page: '/about', users: 1, device: "MOBILE"
+    }]);
+
+    setTimeout(function() {
+        var user = _.find(nodes, function(n) {
+            return n.isUser
+        });
+        prepareNodes([{
+            page: '/home', users: 1, device: "MOBILE"
+        }]);
+        setTimeout(function() {
+            console.thenassert(nodes.indexOf(user) > -1)
+        }, 3000);
+    }, 3000);
 }
+
+
 
 // test();
 
