@@ -104,7 +104,8 @@ function tick(e) {
 // IT UPDATES OLD STATE FROM NEW STATE
 
 function prepareNodes(data) {
-    console.log('prepearing');
+    console.log('mergig new data');
+    breakLastChain();
     var planets, freeUsers;
     var promise = new Promise(function(resolve) {
         resolve();
@@ -319,7 +320,7 @@ function run() {
     data : {},
     delay: delay,
     _timeToNextUpdate: delay,
-    updatesNumberLeft: 99999999,
+    updatesNumberLeft: 20,
     metrics: 'rt:activeUsers',
     dimensions: 'rt:userType,rt:pagePath,rt:deviceCategory'
   };
@@ -371,11 +372,16 @@ function reset() {
  }
 
 
+var TIMEOUT;
 function delay(timeout) {
     return new Promise(function(resolve) {
         if (window.TEST) {
             timeout = 0;
         }
-        setTimeout(resolve, timeout);
+        TIMEOUT = setTimeout(resolve, timeout);
     });
+}
+
+function breakLastChain() {
+    clearTimeout(TIMEOUT);
 }
