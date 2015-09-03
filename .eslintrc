@@ -1,0 +1,26 @@
+{
+    "ecmaFeatures": {
+        "blockBindings": true,
+        "forOf": true,
+        "jsx": true
+    },
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "rules": {
+        "semi": 2,
+        "quotes": [2, "single"],
+        "no-underscore-dangle": 0,
+        "valid-jsdoc": 0,
+        "no-constant-condition": 1,
+        "strict": [0, "never"],
+        "camelcase": 0,
+        "space-infix-ops": 0,
+        "new-cap": 0
+    },
+    "globals": {
+	  "gapi" : false,
+      "d3"
+	}
+}

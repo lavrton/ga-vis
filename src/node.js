@@ -49,12 +49,6 @@ Node.prototype._animateAppending = function () {
 function Page(data) {
     this.radius = 20 + Math.random() * 5;
     Node.call(this, data);
-    if (this._isValuable()) {
-        this.radius += 15;
-        this._createView();
-    }
-
-
 }
 
 Page.prototype = Object.create(Node.prototype);
@@ -79,16 +73,6 @@ Page.prototype.update = function () {
     if (this.userNumberText) {
         this.userNumberText.text('Users: ' + this.users);
     }
-};
-Page.prototype._isValuable = function() {
-    var words = getParameterByName('words') || '';
-    words = words.split(',');
-
-    var contain = _.find(words, function(word) {
-        return this.page.indexOf(word) > -1;
-    }.bind(this));
-
-    return !!contain;
 };
 
 Page.prototype._createView = function() {
@@ -146,32 +130,13 @@ Page.prototype._showDetails = function () {
     this.view.clearCache();
     var offset = 4;
 
-    this.pageText = new Konva.Text({
-        text: 'Page: ' + this.page,
-        fontSize: 15,
-        fill: 'grey'
-    });
-
-    this.pageText.x(layer.getWidth() - this.pageText.width() - offset);
-    this.pageText.y(offset);
-
-    this.userNumberText = new Konva.Text({
-        text: 'Users: ' + this.users,
-        fontSize: 15,
-        fill: 'grey'
-    });
-
-    this.userNumberText.x(layer.getWidth() - this.userNumberText.width() - offset);
-    this.userNumberText.y(offset + this.pageText.height() + offset);
-
-    layer.add(this.pageText, this.userNumberText);
     this.circle.to({
         radius: this.circle.radius(),
         strokeWidth: 2,
         stroke: 'white',
         duration: 0.2
     });
-    this.view.getLayer().batchDraw();
+    d3.select('#details').html('url: ' + this.page + '<br>users: ' + this.users).style('display', 'block');
 };
 
 var background = new Konva.Shape({
@@ -200,12 +165,6 @@ function hideDetails() {
 
 Page.prototype.hideDetails = function () {
     this.selected = false;
-    if (!this.pageText || !this.userNumberText) {
-        return;
-    }
-    this.pageText.destroy();
-    this.userNumberText.destroy();
-    this.userNumberText = null;
     this.circle.to({
         stroke: 'rgba(0,0,0,0)',
         strokeWidth: 0,
@@ -216,7 +175,7 @@ Page.prototype.hideDetails = function () {
             layer.add(this.view);
         }.bind(this)
     });
-    this.view.getLayer().batchDraw();
+    d3.select('#details').style('display', 'none');
 };
 
 
@@ -231,7 +190,7 @@ User.prototype = Object.create(Node.prototype);
 
 User.prototype.update = function () {
     Node.prototype.update.call(this);
-    var maxTailLength = 15;
+    var maxTailLength = 30;
     var dx = this.px - this.x;
     var dy = this.py - this.y;
     var length = Math.abs(dx) + Math.abs(dy);
@@ -239,8 +198,10 @@ User.prototype.update = function () {
         this.tail.points([0,0, 0, 0]);
     } else if (length > maxTailLength / 2) {
         this.tail.points([0,0, dx, dy]);
+    } else if (length < maxTailLength / 4) {
+        this.tail.points([0,0, dx * 5, dy * 5]);
     } else {
-        this.tail.points([0,0, dx * 2, dy * 2]);
+        this.tail.points([0,0, dx * 3, dy * 3]);
     }
     if (this.device === 'DESKTOP') {
         this.circle.fill('#e3935f');
@@ -249,14 +210,6 @@ User.prototype.update = function () {
     } else {
         this.circle.fill('#7ce267');
     }
-    // if (this.selected) {
-    //     var scale = 1.5;
-    //     layer.x(-this.x + (layer.width() / 2 * scale));
-    //     layer.y(-this.y + (layer.height() / 2 * scale));
-    //     layer.scaleX(scale);
-    //     layer.scaleY(scale);
-    // }
-
 };
 
 User.prototype._createView = function() {
